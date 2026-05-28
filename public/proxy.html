@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Titanium Style Proxy</title>
+  <style>
+    body { background:#020617; color:#e5e7eb; font-family:system-ui; margin:0; padding:16px; }
+    h2 { margin-top:0; }
+    .bar { display:flex; gap:8px; }
+    input { flex:1; padding:8px 10px; border-radius:6px; border:1px solid #374151; background:#020617; color:#e5e7eb; }
+    button { padding:8px 14px; border:none; border-radius:6px; background:#38bdf8; color:#020617; font-weight:600; cursor:pointer; }
+    #status { margin-top:8px; font-size:13px; color:#9ca3af; }
+  </style>
+</head>
+<body>
+  <h2>Titanium Style Proxy</h2>
+  <div class="bar">
+    <input id="url" placeholder="Enter URL or search term…">
+    <button onclick="go()">Go</button>
+  </div>
+  <div id="status"></div>
+
+  <script>
+    function buildUrl(input) {
+      input = input.trim();
+      if (!input) return null;
+
+      if (!input.includes(".") || input.includes(" ")) {
+        return "https://www.bing.com/search?q=" + encodeURIComponent(input);
+      }
+      if (!/^https?:\/\//i.test(input)) {
+        input = "https://" + input;
+      }
+      return input;
+    }
+
+    function encodeUrl(str) {
+      return btoa(unescape(encodeURIComponent(str)))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/g, "");
+    }
+
+    function go() {
+      const raw = document.getElementById("url").value;
+      const target = buildUrl(raw);
+      const status = document.getElementById("status");
+
+      if (!target) {
+        status.textContent = "Enter something first.";
+        return;
+      }
+
+      const encoded = encodeUrl(target);
+      const proxied = "/proxy/" + encoded;
+
+      status.textContent = "Loading via proxy: " + target;
+      window.location.href = proxied;
+    }
+
+    document.getElementById("url").addEventListener("keydown", e => {
+      if (e.key === "Enter") go();
+    });
+  </script>
+</body>
+</html>
